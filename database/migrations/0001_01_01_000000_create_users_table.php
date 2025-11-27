@@ -11,9 +11,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('user_genders', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('type');
+            $table->timestamps();
+        });
+
+        \Illuminate\Support\Facades\DB::table('user_genders')->insert([
+            [
+                'name' => 'Мужской',
+                'type' => 'male',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Женский',
+                'type' => 'female',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
+        ]);
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('gender_id')->constrained('user_genders')->cascadeOnDelete();
+            $table->string('name')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -42,6 +65,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('user_genders');
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
